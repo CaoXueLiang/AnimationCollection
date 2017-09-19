@@ -16,6 +16,8 @@
 		5878F7971F710D06005FB87E /* WaveAnimationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5878F7961F710D06005FB87E /* WaveAnimationTests.m */; };
 		5878F7A21F710D06005FB87E /* WaveAnimationUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5878F7A11F710D06005FB87E /* WaveAnimationUITests.m */; };
 		5878F7B21F710DDD005FB87E /* WaveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5878F7B11F710DDD005FB87E /* WaveView.m */; };
+		C3B345CF1F715F41008DD72C /* blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B345CD1F715F41008DD72C /* blue.png */; };
+		C3B345D01F715F41008DD72C /* white.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B345CE1F715F41008DD72C /* white.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +56,8 @@
 		5878F7A31F710D06005FB87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5878F7B01F710DDD005FB87E /* WaveView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaveView.h; sourceTree = "<group>"; };
 		5878F7B11F710DDD005FB87E /* WaveView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaveView.m; sourceTree = "<group>"; };
+		C3B345CD1F715F41008DD72C /* blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blue.png; sourceTree = "<group>"; };
+		C3B345CE1F715F41008DD72C /* white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = white.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +151,8 @@
 		5878F7AF1F710D8F005FB87E /* Class */ = {
 			isa = PBXGroup;
 			children = (
+				C3B345CD1F715F41008DD72C /* blue.png */,
+				C3B345CE1F715F41008DD72C /* white.png */,
 				5878F7B01F710DDD005FB87E /* WaveView.h */,
 				5878F7B11F710DDD005FB87E /* WaveView.m */,
 			);
@@ -263,6 +269,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5878F78C1F710D06005FB87E /* LaunchScreen.storyboard in Resources */,
+				C3B345CF1F715F41008DD72C /* blue.png in Resources */,
+				C3B345D01F715F41008DD72C /* white.png in Resources */,
 				5878F7891F710D06005FB87E /* Assets.xcassets in Resources */,
 				5878F7871F710D06005FB87E /* Main.storyboard in Resources */,
 			);
@@ -532,6 +540,7 @@
 				5878F7A81F710D06005FB87E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5878F7A91F710D06005FB87E /* Build configuration list for PBXNativeTarget "WaveAnimationTests" */ = {
 			isa = XCConfigurationList;
@@ -540,6 +549,7 @@
 				5878F7AB1F710D06005FB87E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5878F7AC1F710D06005FB87E /* Build configuration list for PBXNativeTarget "WaveAnimationUITests" */ = {
 			isa = XCConfigurationList;
@@ -548,6 +558,7 @@
 				5878F7AE1F710D06005FB87E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

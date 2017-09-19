@@ -18,9 +18,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-    _wave = [[WaveView alloc]initWithFrame:CGRectMake(50, 200, 200, 200)];
-    [self.view addSubview:_wave];
+    _wave = [[WaveView alloc]initWithFrame:CGRectInset(self.view.bounds, 100, 100)];
     [_wave startAnimation];
+    [self.view addSubview:_wave];
 }
 
 
