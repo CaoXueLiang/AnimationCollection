@@ -16,6 +16,7 @@
 		5878F7971F710D06005FB87E /* WaveAnimationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5878F7961F710D06005FB87E /* WaveAnimationTests.m */; };
 		5878F7A21F710D06005FB87E /* WaveAnimationUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5878F7A11F710D06005FB87E /* WaveAnimationUITests.m */; };
 		5878F7B21F710DDD005FB87E /* WaveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5878F7B11F710DDD005FB87E /* WaveView.m */; };
+		58C3C4D21F72072100FBF918 /* DownWaveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C3C4D11F72072100FBF918 /* DownWaveView.m */; };
 		C3B345CF1F715F41008DD72C /* blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B345CD1F715F41008DD72C /* blue.png */; };
 		C3B345D01F715F41008DD72C /* white.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B345CE1F715F41008DD72C /* white.png */; };
 /* End PBXBuildFile section */
@@ -56,6 +57,8 @@
 		5878F7A31F710D06005FB87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5878F7B01F710DDD005FB87E /* WaveView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaveView.h; sourceTree = "<group>"; };
 		5878F7B11F710DDD005FB87E /* WaveView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaveView.m; sourceTree = "<group>"; };
+		58C3C4D01F72072100FBF918 /* DownWaveView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownWaveView.h; sourceTree = "<group>"; };
+		58C3C4D11F72072100FBF918 /* DownWaveView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownWaveView.m; sourceTree = "<group>"; };
 		C3B345CD1F715F41008DD72C /* blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blue.png; sourceTree = "<group>"; };
 		C3B345CE1F715F41008DD72C /* white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = white.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -155,6 +158,8 @@
 				C3B345CE1F715F41008DD72C /* white.png */,
 				5878F7B01F710DDD005FB87E /* WaveView.h */,
 				5878F7B11F710DDD005FB87E /* WaveView.m */,
+				58C3C4D01F72072100FBF918 /* DownWaveView.h */,
+				58C3C4D11F72072100FBF918 /* DownWaveView.m */,
 			);
 			path = Class;
 			sourceTree = "<group>";
@@ -299,6 +304,7 @@
 			files = (
 				5878F7841F710D06005FB87E /* ViewController.m in Sources */,
 				5878F7811F710D06005FB87E /* AppDelegate.m in Sources */,
+				58C3C4D21F72072100FBF918 /* DownWaveView.m in Sources */,
 				5878F77E1F710D06005FB87E /* main.m in Sources */,
 				5878F7B21F710DDD005FB87E /* WaveView.m in Sources */,
 			);

@@ -8,19 +8,28 @@
 
 #import "ViewController.h"
 #import "WaveView.h"
+#import "DownWaveView.h"
 
 @interface ViewController ()
 @property (nonatomic,strong) WaveView *wave;
+@property (nonatomic,strong) DownWaveView *downView;
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-    _wave = [[WaveView alloc]initWithFrame:CGRectInset(self.view.bounds, 100, 100)];
+    self.view.backgroundColor = [UIColor whiteColor];
+    _wave = [[WaveView alloc]initWithFrame:CGRectMake(0, 0, 90, 90)];
+    _wave.center = CGPointMake(CGRectGetWidth(self.view.bounds)/2, 150);
     [_wave startAnimation];
     [self.view addSubview:_wave];
+    
+    
+    _downView = [[DownWaveView alloc]initWithFrame:CGRectMake(0, 0, 120, 120)];
+    _downView.center = CGPointMake(CGRectGetWidth(self.view.bounds)/2.0, 300);
+    [_downView startAnimation];
+    [self.view addSubview:_downView];
 }
 
 
