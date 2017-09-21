@@ -28,7 +28,6 @@
     
     _downView = [[DownWaveView alloc]initWithFrame:CGRectMake(0, 0, 120, 120)];
     _downView.center = CGPointMake(CGRectGetWidth(self.view.bounds)/2.0, 300);
-    [_downView startAnimation];
     [self.view addSubview:_downView];
 }
 
