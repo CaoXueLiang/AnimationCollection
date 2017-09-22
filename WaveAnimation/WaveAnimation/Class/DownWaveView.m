@@ -118,7 +118,7 @@
 
 - (void)updatePath:(CADisplayLink *)link{
     _offSetX += 0.12;
-    _offSetY -= 0.3;
+    _offSetY -= 0.4;
     _waveSinLayer.path = [self createLayerPathWithType:LayerTypeSin].CGPath;
     _waveCosLayer.path = [self createLayerPathWithType:LayerTypeCos].CGPath;
     if (_offSetY <= -_amplitude) {
