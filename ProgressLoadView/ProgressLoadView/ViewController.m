@@ -10,7 +10,7 @@
 #import "DownLoadProgressView.h"
 #import "AFNetworking.h"
 
-@interface ViewController ()
+@interface ViewController ()<JSDownloadAnimationDelegate>
 @property (nonatomic,strong) DownLoadProgressView *progressView;
 @end
 
@@ -19,9 +19,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithRed:28/255.0 green:136/255.0 blue:238/255.0 alpha:1];
-    _progressView = [[DownLoadProgressView alloc]initWithFrame:CGRectMake(0, 0, 150, 150)];
+    _progressView = [[DownLoadProgressView alloc]initWithFrame:CGRectMake(0, 0, 100, 100)];
     _progressView.center = self.view.center;
+    _progressView.delegate = self;
     [self.view addSubview:_progressView];
+}
+
+- (void)startDownLoad{
     [self downLoad];
 }
 
@@ -45,7 +49,6 @@
     } completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
      
     }];
-    
     //开始启动任务
     [task resume];
 }

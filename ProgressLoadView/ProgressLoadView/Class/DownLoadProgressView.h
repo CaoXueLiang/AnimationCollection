@@ -7,9 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+
+@protocol JSDownloadAnimationDelegate <NSObject>
+- (void)startDownLoad;
+@end
 
 @interface DownLoadProgressView : UIView
-
+@property (nonatomic,weak) id<JSDownloadAnimationDelegate> delegate;
 /**
  进度条的进度
  */

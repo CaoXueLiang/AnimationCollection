@@ -22,6 +22,18 @@
 @property (nonatomic,strong) CAShapeLayer *verticalLineLayer;
 /*箭头端点线*/
 @property (nonatomic,strong) CAShapeLayer *arrowsLayer;
+/*进度条label*/
+@property (nonatomic,strong) UILabel *progressLabel;
+
+/*正弦函数参数*/
+/*振幅*/
+@property (nonatomic,assign) CGFloat amplitude;
+/*角速度*/
+@property (nonatomic,assign) CGFloat angularVelocity;
+/*初相*/
+@property (nonatomic,assign) CGFloat offSetX;
+/*偏距*/
+@property (nonatomic,assign) CGFloat offSetY;
 @end
 
 @implementation DownLoadProgressView{
@@ -47,34 +59,11 @@
 }
 
 - (void)addSubViews{
-    _backCircleLayer = [CAShapeLayer layer];
-    UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:self.frame];
-    _backCircleLayer.path = path.CGPath;
-    _backCircleLayer.lineWidth = CircleLineWidth;
-    _backCircleLayer.strokeColor = [[UIColor whiteColor]colorWithAlphaComponent:0.3].CGColor;
-    _backCircleLayer.fillColor = [UIColor clearColor].CGColor;
-    [self.layer addSublayer:_backCircleLayer];
-    
-    
-    _circleLayer = [CAShapeLayer layer];
-    _verticalLineLayer = [CAShapeLayer layer];
-    _verticalLineLayer.path = [self beginVerticalLinePath].CGPath;
-    _verticalLineLayer.strokeColor = [UIColor whiteColor].CGColor;
-    _verticalLineLayer.fillColor = [UIColor clearColor].CGColor;
-    _verticalLineLayer.lineCap = kCALineCapRound;
-    _verticalLineLayer.lineJoin = kCALineJoinRound;
-    _verticalLineLayer.lineWidth = ArrowLineWidth;
-    [self.layer addSublayer:_verticalLineLayer];
-    
-    
-    _arrowsLayer = [CAShapeLayer layer];
-    _arrowsLayer.path = [self beginArrawPath].CGPath;
-    _arrowsLayer.strokeColor = [UIColor whiteColor].CGColor;
-    _arrowsLayer.fillColor = [UIColor clearColor].CGColor;
-    _arrowsLayer.lineCap = kCALineCapRound;
-    _arrowsLayer.lineJoin = kCALineJoinRound;
-    _arrowsLayer.lineWidth = ArrowLineWidth;
-    [self.layer addSublayer:_arrowsLayer];
+    [self.layer addSublayer:self.backCircleLayer];
+    [self.layer addSublayer:self.circleLayer];
+    [self.layer addSublayer:self.verticalLineLayer];
+    [self.layer addSublayer:self.arrowsLayer];
+    [self addSubview:self.progressLabel];
 }
 
 - (void)setUp{
@@ -86,6 +75,12 @@
     _horizontalArrowWidth = CGRectGetWidth(self.frame) * 0.7;
     _arrowMoveDownPading = CGRectGetHeight(self.frame) *0.06;
     _arrowMoveUpPading = CGRectGetHeight(self.frame) *0.03;
+    
+    /*波浪线参数*/
+    _amplitude = 3;
+    _angularVelocity = 0.3;
+    _offSetX = 1;
+    _offSetY = CGRectGetHeight(self.frame)/2.0;
 }
 
 - (void)addTapGesture{
@@ -96,6 +91,13 @@
 
 - (void)UpDate:(CADisplayLink *)link{
     self.circleLayer.path = [self circleProgressPath].CGPath;
+    self.offSetX += 0.3;
+    self.arrowsLayer.path = [self wavePathMenthod].CGPath;
+    
+    if (_progress == 1.0) {
+        [_link invalidate];
+        [self curveToCheckAnimation];
+    }
 }
 
 - (void)setProgress:(CGFloat)progress{
@@ -129,7 +131,7 @@
     positionAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(0, -(CGRectGetHeight(self.frame)/2.0) + CircleLineWidth/2.0 + 1)];
     positionAnimation.mass = 1.0;
     positionAnimation.damping = 10.0;
-    positionAnimation.initialVelocity = 40.0;
+    positionAnimation.initialVelocity = 0.0;
     positionAnimation.duration = 1;
     positionAnimation.removedOnCompletion = NO;
     positionAnimation.fillMode = kCAFillModeForwards;
@@ -156,6 +158,35 @@
     [self.arrowsLayer addAnimation:animation forKey:nil];
 }
 
+/*波浪线--->对勾*/
+- (void)curveToCheckAnimation{
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"path"];
+    animation.values = @[(__bridge id)[self horizontalArrowLinePath].CGPath,(__bridge id)[self checkPath].CGPath];
+    animation.duration = 0.3;
+    animation.removedOnCompletion = NO;
+    animation.fillMode = kCAFillModeForwards;
+    animation.delegate = self;
+    [animation setValue:@"cureToCheck" forKey:AnimationKey];
+    [self.arrowsLayer addAnimation:animation forKey:nil];
+}
+
+/*对勾放大缩小弹性动画*/
+- (void)checkAmplificationMenthod{
+    CASpringAnimation *animation = [CASpringAnimation animationWithKeyPath:@"transform"];
+    CATransform3D transform = CATransform3DIdentity;
+    CATransform3D transitionFrom = CATransform3DScale(transform, 1.1, 1.1, 1);
+    CATransform3D transitionTo = CATransform3DScale(transform, 1.0, 1.0, 1);
+    animation.fromValue = [NSValue valueWithCATransform3D:transitionFrom];
+    animation.toValue = [NSValue valueWithCATransform3D:transitionTo];
+    animation.duration = 0.3;
+    animation.mass = 1;
+    animation.damping = 10.0;
+    animation.initialVelocity = 0;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [animation setValue:@"checkLarge" forKey:AnimationKey];
+    [self.arrowsLayer addAnimation:animation forKey:nil];
+}
+
 #pragma mark - CAAnimationDelegate
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag{
     if ([[anim valueForKey:AnimationKey] isEqualToString:@"lineToPoint"]) {
@@ -167,8 +198,25 @@
         _link = [CADisplayLink displayLinkWithTarget:self selector:@selector(UpDate:)];
         [_link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         
+        [self.arrowsLayer removeFromSuperlayer];
+        self.arrowsLayer = nil;
+        [self.layer addSublayer:self.arrowsLayer];
+        
+//        self.progressLabel.frame = CGSizeMake(10, 4);
+//        self.progressLabel.hidden = NO;
+//        [UIView animateWithDuration:0.3 animations:^{
+//            self.progressLabel.frame.size = CGSizeMake(50, 20);
+//            self.progressLabel.alpha = 1.0;
+//        }];
+        
+        if ([self.delegate respondsToSelector:@selector(startDownLoad)]) {
+            [self.delegate startDownLoad];
+        }
+        
     }else if ([[anim valueForKey:AnimationKey] isEqualToString:@"arrowToLine"]){
     
+    }else if ([[anim valueForKey:AnimationKey] isEqualToString:@"cureToCheck"]){
+        [self checkAmplificationMenthod];
     }
 }
 
@@ -232,12 +280,97 @@
 /**初始下载进度path*/
 - (UIBezierPath *)circleProgressPath{
     CGFloat startPoint = M_PI*3/2.0;
-    CGFloat endAngle = startPoint - M_PI*2*_progress;
+    CGFloat endAngle = startPoint - M_PI*2.0 *_progress;
     UIBezierPath *circlePath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetWidth(self.frame)/2.0, CGRectGetHeight(self.frame)/2.0) radius:CGRectGetWidth(self.frame)/2.0 startAngle:startPoint endAngle:endAngle clockwise:NO];
     return circlePath;
 }
 
+/*波浪线path*/
+- (UIBezierPath *)wavePathMenthod{
+    UIBezierPath *wavePath = [UIBezierPath bezierPath];
+    CGFloat start = (CGRectGetWidth(self.frame) - _horizontalArrowWidth)/2.0;
+    [wavePath moveToPoint:CGPointMake(start,CGRectGetHeight(self.frame)/2.0)];
+    CGFloat Y = 0.0;
+    for (int i = start; i <= start + _horizontalArrowWidth; i++) {
+        Y = _amplitude *sinf(_angularVelocity * i + _offSetX) + _offSetY;
+        [wavePath addLineToPoint:CGPointMake(i, Y)];
+    }
+    return wavePath;
+}
 
+/*对勾路径*/
+- (UIBezierPath *)checkPath{
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    CGRect rectInCircle = CGRectInset(self.bounds, self.bounds.size.width*0.3, self.bounds.size.width*0.3);
+    [path moveToPoint:CGPointMake(rectInCircle.origin.x + rectInCircle.size.width/9, rectInCircle.origin.y + rectInCircle.size.height*2/3)];
+    [path addLineToPoint:CGPointMake(rectInCircle.origin.x + rectInCircle.size.width/3,rectInCircle.origin.y + rectInCircle.size.height*9/10)];
+    [path addLineToPoint:CGPointMake(rectInCircle.origin.x + rectInCircle.size.width*8/10, rectInCircle.origin.y + rectInCircle.size.height*2/10)];
+    return path;
+}
+
+#pragma mark - Setter && Getter
+- (CAShapeLayer *)backCircleLayer{
+    if (!_backCircleLayer) {
+        _backCircleLayer = [CAShapeLayer layer];
+        UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:self.frame];
+        _backCircleLayer.path = path.CGPath;
+        _backCircleLayer.lineWidth = CircleLineWidth;
+        _backCircleLayer.strokeColor = [[UIColor whiteColor]colorWithAlphaComponent:0.3].CGColor;
+        _backCircleLayer.fillColor = [UIColor clearColor].CGColor;
+    }
+    return _backCircleLayer;
+}
+
+- (CAShapeLayer *)circleLayer{
+    if (!_circleLayer) {
+        _circleLayer = [CAShapeLayer layer];
+        _circleLayer.lineWidth = CircleLineWidth;
+        _circleLayer.fillColor = [UIColor clearColor].CGColor;
+        _circleLayer.strokeColor = [UIColor whiteColor].CGColor;
+        _circleLayer.lineJoin = kCALineJoinRound;
+        _circleLayer.lineCap = kCALineCapRound;
+    }
+    return _circleLayer;
+}
+
+- (CAShapeLayer *)verticalLineLayer{
+    if (!_verticalLineLayer) {
+        _verticalLineLayer = [CAShapeLayer layer];
+        _verticalLineLayer.path = [self beginVerticalLinePath].CGPath;
+        _verticalLineLayer.strokeColor = [UIColor whiteColor].CGColor;
+        _verticalLineLayer.fillColor = [UIColor clearColor].CGColor;
+        _verticalLineLayer.lineCap = kCALineCapRound;
+        _verticalLineLayer.lineJoin = kCALineJoinRound;
+        _verticalLineLayer.lineWidth = ArrowLineWidth;
+    }
+    return _verticalLineLayer;
+}
+
+- (CAShapeLayer *)arrowsLayer{
+    if (!_arrowsLayer) {
+        _arrowsLayer = [CAShapeLayer layer];
+        _arrowsLayer.path = [self beginArrawPath].CGPath;
+        _arrowsLayer.strokeColor = [UIColor whiteColor].CGColor;
+        _arrowsLayer.fillColor = [UIColor clearColor].CGColor;
+        _arrowsLayer.lineCap = kCALineCapRound;
+        _arrowsLayer.lineJoin = kCALineJoinRound;
+        _arrowsLayer.lineWidth = ArrowLineWidth;
+    }
+    return _arrowsLayer;
+}
+
+- (UILabel *)progressLabel{
+    if (!_progressLabel) {
+        _progressLabel = [UILabel new];
+        _progressLabel.frame = CGRectMake(0, 0,50, 20);
+        _progressLabel.center = CGPointMake(_middleX, CGRectGetHeight(self.frame)/4.0*3);
+        _progressLabel.text = [NSString stringWithFormat:@"%f%@",_progress,@"%"];
+        _progressLabel.textAlignment = NSTextAlignmentCenter;
+        _progressLabel.alpha = 0;
+        _progressLabel.hidden = YES;
+    }
+    return _progressLabel;
+}
 
 @end
 

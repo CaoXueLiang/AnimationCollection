@@ -325,7 +325,7 @@
 				TargetAttributes = {
 					583337B31F73D32000C5465C = {
 						CreatedOnToolsVersion = 8.3.1;
-						DevelopmentTeam = 49YMBTW8W3;
+						DevelopmentTeam = 3PXZ8TZBJ4;
 						ProvisioningStyle = Automatic;
 					};
 					583337CC1F73D32000C5465C = {
@@ -563,7 +563,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 49YMBTW8W3;
+				DEVELOPMENT_TEAM = 3PXZ8TZBJ4;
 				INFOPLIST_FILE = ProgressLoadView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ovov.ProgressLoadView;
@@ -575,7 +575,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 49YMBTW8W3;
+				DEVELOPMENT_TEAM = 3PXZ8TZBJ4;
 				INFOPLIST_FILE = ProgressLoadView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ovov.ProgressLoadView;
