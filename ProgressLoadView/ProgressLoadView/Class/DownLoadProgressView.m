@@ -93,9 +93,18 @@
     self.circleLayer.path = [self circleProgressPath].CGPath;
     self.offSetX += 0.3;
     self.arrowsLayer.path = [self wavePathMenthod].CGPath;
+    self.progressLabel.text = [NSString stringWithFormat:@"%.0f %@",_progress *100,@"%"];
     
     if (_progress == 1.0) {
         [_link invalidate];
+        /*将进度label缩小*/
+        [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.progressLabel.bounds = CGRectMake(0, 0,5,2);
+            self.progressLabel.font = [UIFont systemFontOfSize:5];
+            self.progressLabel.alpha = 0.0;
+        } completion:^(BOOL finished) {
+            self.progressLabel.hidden = YES;
+        }];
         [self curveToCheckAnimation];
     }
 }
@@ -106,7 +115,9 @@
 
 #pragma mark - Animations
 - (void)startAniamtion:(UITapGestureRecognizer *)recognizer{
-    
+    //动画开始时不能响应事件
+    self.userInteractionEnabled = NO;
+    _progress = 0;
     [self VerticalLineToPointAnimation];
     [self arrowToLineAnimation];
 }
@@ -182,9 +193,48 @@
     animation.mass = 1;
     animation.damping = 10.0;
     animation.initialVelocity = 0;
+    animation.delegate = self;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [animation setValue:@"checkLarge" forKey:AnimationKey];
     [self.arrowsLayer addAnimation:animation forKey:nil];
+}
+
+/*对勾变箭头*/
+- (void)checkToArrowAnimation{
+    CAKeyframeAnimation *lineAnimation = [CAKeyframeAnimation animationWithKeyPath:@"path"];
+    lineAnimation.values = @[(__bridge id)[self checkShortLinePath].CGPath,(__bridge id)[self beginVerticalLinePath].CGPath];
+    lineAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    lineAnimation.duration = 1.0;
+    lineAnimation.removedOnCompletion = NO;
+    lineAnimation.fillMode = kCAFillModeForwards;
+    [self.verticalLineLayer addAnimation:lineAnimation forKey:nil];
+    
+    CAKeyframeAnimation *checkAnimation = [CAKeyframeAnimation animationWithKeyPath:@"path"];
+    checkAnimation.values = @[(__bridge id)[self checkPath].CGPath,(__bridge id)[self beginArrawPath].CGPath];
+    checkAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    checkAnimation.duration = 1.0;
+    checkAnimation.removedOnCompletion = NO;
+    checkAnimation.fillMode = kCAFillModeForwards;
+    [self.arrowsLayer addAnimation:checkAnimation forKey:nil];
+}
+
+/*进度圆环变细,透明度变0*/
+- (void)progressCircleToAlpha{
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"lineWidth"];
+    animation.toValue = @0.5;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    
+    CABasicAnimation *animation2 = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    animation2.toValue = @0;
+    animation2.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    
+    CAAnimationGroup *group = [[CAAnimationGroup alloc]init];
+    group.animations = @[animation,animation2];
+    group.duration = 1.0;
+    group.delegate = self;
+    
+    [group setValue:@"CircleToAlpha" forKey:AnimationKey];
+    [self.circleLayer addAnimation:group forKey:nil];
 }
 
 #pragma mark - CAAnimationDelegate
@@ -198,16 +248,23 @@
         _link = [CADisplayLink displayLinkWithTarget:self selector:@selector(UpDate:)];
         [_link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         
+        
         [self.arrowsLayer removeFromSuperlayer];
         self.arrowsLayer = nil;
         [self.layer addSublayer:self.arrowsLayer];
         
-//        self.progressLabel.frame = CGSizeMake(10, 4);
-//        self.progressLabel.hidden = NO;
-//        [UIView animateWithDuration:0.3 animations:^{
-//            self.progressLabel.frame.size = CGSizeMake(50, 20);
-//            self.progressLabel.alpha = 1.0;
-//        }];
+        self.progressLabel.hidden = NO;
+        [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.progressLabel.bounds = CGRectMake(0, 0,50,20);
+            self.progressLabel.font = [UIFont systemFontOfSize:14];
+            self.progressLabel.alpha = 1.0;
+        } completion:^(BOOL finished) {
+            
+            //将verticalLineLayer删除
+            [self.verticalLineLayer removeFromSuperlayer];
+            self.verticalLineLayer = nil;
+            
+        }];
         
         if ([self.delegate respondsToSelector:@selector(startDownLoad)]) {
             [self.delegate startDownLoad];
@@ -217,6 +274,24 @@
     
     }else if ([[anim valueForKey:AnimationKey] isEqualToString:@"cureToCheck"]){
         [self checkAmplificationMenthod];
+        
+    }else if ([[anim valueForKey:AnimationKey]isEqualToString:@"checkLarge"]){
+        
+        /*对勾绘制完成后,将箭头添加上*/
+        self.verticalLineLayer.path = [self checkShortLinePath].CGPath;
+        [self.layer addSublayer:self.verticalLineLayer];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self checkToArrowAnimation];
+            [self progressCircleToAlpha];
+        });
+    }else if ([[anim valueForKey:AnimationKey]isEqualToString:@"CircleToAlpha"]){
+        [self.circleLayer removeFromSuperlayer];
+        self.circleLayer = nil;
+        [self.layer addSublayer:self.circleLayer];
+        
+        //动画结束后才能响应事件
+        self.userInteractionEnabled = YES;
     }
 }
 
@@ -235,6 +310,15 @@
     [pointPath moveToPoint:CGPointMake(_middleX, CGRectGetHeight(self.frame)/2.0-3)];
     [pointPath addLineToPoint:CGPointMake(_middleX, CGRectGetHeight(self.frame)/2.0-3)];
     return pointPath;
+}
+
+/*竖线变为对勾的左侧*/
+- (UIBezierPath *)checkShortLinePath{
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    CGRect rectInCircle = CGRectInset(self.bounds, self.bounds.size.width*0.3, self.bounds.size.width*0.3);
+    [path moveToPoint:CGPointMake(rectInCircle.origin.x + rectInCircle.size.width/9, rectInCircle.origin.y + rectInCircle.size.height*2/3)];
+    [path addLineToPoint:CGPointMake(rectInCircle.origin.x + rectInCircle.size.width/3,rectInCircle.origin.y + rectInCircle.size.height*9/10)];
+    return path;
 }
 
 /**初始箭头path*/
@@ -327,8 +411,8 @@
         _circleLayer.lineWidth = CircleLineWidth;
         _circleLayer.fillColor = [UIColor clearColor].CGColor;
         _circleLayer.strokeColor = [UIColor whiteColor].CGColor;
-        _circleLayer.lineJoin = kCALineJoinRound;
-        _circleLayer.lineCap = kCALineCapRound;
+        //_circleLayer.lineJoin = kCALineJoinRound;
+        //_circleLayer.lineCap = kCALineCapRound;
     }
     return _circleLayer;
 }
@@ -362,9 +446,11 @@
 - (UILabel *)progressLabel{
     if (!_progressLabel) {
         _progressLabel = [UILabel new];
-        _progressLabel.frame = CGRectMake(0, 0,50, 20);
+        _progressLabel.font = [UIFont systemFontOfSize:5];
+        _progressLabel.textColor = [UIColor whiteColor];
+        _progressLabel.bounds = CGRectMake(0, 0,5, 2);
         _progressLabel.center = CGPointMake(_middleX, CGRectGetHeight(self.frame)/4.0*3);
-        _progressLabel.text = [NSString stringWithFormat:@"%f%@",_progress,@"%"];
+        _progressLabel.text = [NSString stringWithFormat:@"%.0f %@",_progress *100,@"%"];
         _progressLabel.textAlignment = NSTextAlignmentCenter;
         _progressLabel.alpha = 0;
         _progressLabel.hidden = YES;
